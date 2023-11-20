@@ -55,8 +55,20 @@ if (!isset($_SESSION['uname'])) {
                      <!-- End -->
                     <!-- Credit card form content -->
                     <div class="tab-content">
-                        <div class="row">
-                            
+                        <div class="container mt-5 mb-5">
+                            <div class="row justify-content-center">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h3 class="card-title text-center">Time Left</h3>
+                                            <div id="timer" class="text-center display-4"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">                        
+
                                 <?php
 
                                 include_once 'Database.php'; 
@@ -66,72 +78,78 @@ if (!isset($_SESSION['uname'])) {
                                 
                                 if(isset($_POST['submit'])){
                                     $show = $_POST['show'];
-                                $result = mysqli_query($conn,"SELECT u.username,u.email,u.mobile,u.city,t.theater FROM user u INNER JOIN theater_show t on u.username = '".$username."' WHERE t.show = '".$show."'");
-                                $seats1 = implode(",", $_POST["seat"]);
-                                $seats = explode(",", $seats1);
-                                $price= 0;
-                                for($i=1;$i<=12;$i++){
-                                    $I = "I".$i;
-                                    $H = "H".$i;
-                                    $G = "G".$i;
-                                    $F = "F".$i;
-                                    $E = "E".$i;
-                                    $D = "D".$i;
-                                    $C = "C".$i;
-                                    $B = "B".$i;
-                                    $A = "A".$i;
-                                    
-                                if(in_array($I,$seats)){
-                                    $price=$price+100;
-                                }
-                                if (in_array($H, $seats)){
-                                   $price=$price+100;   
-                                }
-                                if (in_array($G, $seats)){
-                                   $price=$price+100;   
-                                }
-                                if (in_array($F, $seats)){
-                                   $price=$price+150;   
-                                }
-                                if (in_array($E, $seats)){
-                                   $price=$price+150;   
-                                }
-                                if (in_array($D, $seats)){
-                                   $price=$price+150;   
-                                }
-                                if (in_array($C, $seats)){
-                                   $price=$price+150;   
-                                }
-                                if (in_array($B, $seats)){
-                                   $price=$price+150;   
-                                }
-                                if (in_array($A, $seats)){
-                                   $price=$price+300;   
-                                }
-                            }                              
-                           
-                           if (mysqli_num_rows($result) > 0) {
-                                        while($row = mysqli_fetch_array($result)) {
-                                       echo'<div class="col-lg-6">
-                                Your Username: '.$row['username'].'<br>
-                                Phone no.: '.$row['mobile'].'<br>
-                                Movie Name: '.$_POST['movie'].'<br>
-                                Seats: '.implode(",", $_POST["seat"]).' <br>
-                                Payment Date: '.date("D-m-y ",strtotime('today')).'
-                                </div>
-                            <div class="col-lg-6">
-                                
-                                Email: '.$row['email'].'<br>
-                                City: '.$row['city'].'<br>
-                                Theater: '.$row['theater'].'<br>  
-                                Total Seats: '.$_POST['totalseat'].' <br>
-                                Time: '.$_POST['show'].'<br>
-                                Booking Date: '.date("D-m-y ",strtotime('tomorrow')).'
-                            
-                            </div>' ;
-                                
+                                    $movie = mysqli_real_escape_string($conn,$_POST['movie']);
+                                    $time = mysqli_real_escape_string($conn,$_POST['show']);
+                                    $lock_until = date("Y-m-d H:i:s",strtotime(date("Y-m-d H:i:s")." +10 minutes"));
+                                    foreach($_POST['seat'] as $seat){
+                                        $insert_record=mysqli_query($conn,"INSERT INTO seat_lock VALUES('$movie', '$time', '$seat', '$lock_until')");
                                     }
-                                }
+                                    $result = mysqli_query($conn,"SELECT u.username,u.email,u.mobile,u.city,t.theater FROM user u INNER JOIN theater_show t on u.username = '".$username."' WHERE t.show = '".$show."'");
+                                    $seats1 = implode(",", $_POST["seat"]);
+                                    $seats = explode(",", $seats1);
+                                    $price= 0;
+                                    for($i=1;$i<=12;$i++){
+                                        $I = "I".$i;
+                                        $H = "H".$i;
+                                        $G = "G".$i;
+                                        $F = "F".$i;
+                                        $E = "E".$i;
+                                        $D = "D".$i;
+                                        $C = "C".$i;
+                                        $B = "B".$i;
+                                        $A = "A".$i;
+                                        
+                                    if(in_array($I,$seats)){
+                                        $price=$price+100;
+                                    }
+                                    if (in_array($H, $seats)){
+                                    $price=$price+100;   
+                                    }
+                                    if (in_array($G, $seats)){
+                                    $price=$price+100;   
+                                    }
+                                    if (in_array($F, $seats)){
+                                    $price=$price+150;   
+                                    }
+                                    if (in_array($E, $seats)){
+                                    $price=$price+150;   
+                                    }
+                                    if (in_array($D, $seats)){
+                                    $price=$price+150;   
+                                    }
+                                    if (in_array($C, $seats)){
+                                    $price=$price+150;   
+                                    }
+                                    if (in_array($B, $seats)){
+                                    $price=$price+150;   
+                                    }
+                                    if (in_array($A, $seats)){
+                                    $price=$price+300;   
+                                    }
+                                }                              
+                            
+                            if (mysqli_num_rows($result) > 0) {
+                                            while($row = mysqli_fetch_array($result)) {
+                                        echo'<div class="col-lg-6">
+                                    Your Username: '.$row['username'].'<br>
+                                    Phone no.: '.$row['mobile'].'<br>
+                                    Movie Name: '.$_POST['movie'].'<br>
+                                    Seats: '.implode(",", $_POST["seat"]).' <br>
+                                    Payment Date: '.date("D-m-y ",strtotime('today')).'
+                                    </div>
+                                <div class="col-lg-6">
+                                    
+                                    Email: '.$row['email'].'<br>
+                                    City: '.$row['city'].'<br>
+                                    Theater: '.$row['theater'].'<br>  
+                                    Total Seats: '.$_POST['totalseat'].' <br>
+                                    Time: '.$_POST['show'].'<br>
+                                    Booking Date: '.date("D-m-y ",strtotime('tomorrow')).'
+                                
+                                </div>' ;
+                                    
+                                        }
+                                    }
                                }  
                                 ?>  
                             <input type="hidden" id="movie" value="<?php echo $_POST['movie'];?>">
@@ -183,8 +201,9 @@ if (!isset($_SESSION['uname'])) {
                                 </div>
                             </div>
                                 <div id="msg"></div>
-                                <div class="card-footer"> <button type="submit" id="payment" class="subscribe btn btn-primary btn-block shadow-sm"> Confirm Payment </button>
-
+                                <div class="card-footer"> 
+                                    <button type="submit" id="payment" class="subscribe btn btn-primary btn-block shadow-sm"> Confirm Payment </button>
+                                    <button type="button" onclick="releaseLock()" id="cancel" class="subscribe btn btn-danger btn-block shadow-sm"> Cancel </button>
                                 </div>
                             
                         </div>
@@ -206,7 +225,45 @@ if (!isset($_SESSION['uname'])) {
     <script src="js/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
 <script type="text/javascript">
-    
+    function releaseLock(){
+        var movie = $("#movie").val().trim();
+        var time = $("#time").val().trim();
+        $.ajax({
+            url:'remove_lock.php',
+            type:'post',
+            data:{
+                movie:movie,
+                time:time,
+                seats:$("#seat").val().trim(),
+            },
+            success:function(response){
+                window.location = "seatbooking.php?movie=" + movie + "&time=" + time;
+            }
+        });
+    }
+    $(document).ready(function() {
+    var countdownDuration = 10 * 60;
+
+    function updateTimerDisplay(seconds) {
+        var minutes = Math.floor(seconds / 60);
+        var remainingSeconds = seconds % 60;
+        $("#timer").text(pad(minutes) + ":" + pad(remainingSeconds));
+    }
+    function pad(number) {
+        return (number < 10) ? "0" + number : number;
+    }
+    updateTimerDisplay(countdownDuration);
+    var countdown = setInterval(function() {
+        countdownDuration--;
+
+        if (countdownDuration >= 0) {
+            updateTimerDisplay(countdownDuration);
+        } else {
+            $("#timer").text("Time's up!");
+            clearInterval(countdown);            
+        }
+    }, 1000);
+});
     $(document).ready(function(){
   $("#payment").click(function(){
     var movie = $("#movie").val().trim();
@@ -258,13 +315,12 @@ if (!isset($_SESSION['uname'])) {
             cvv:cvv,
             },
       success:function(response){
-          if(response == 1){
-                                    window.location = "tickes.php";
-                                }else{
-                                     error = " <font color='red'>!Invalid UserId.</font> ";
-                                     document.getElementById( "msg" ).innerHTML = error;
-                                      return false;
-                                }
+        if(response == 1){
+            window.location = "tickes.php";
+        }else{
+                alert(response);
+                window.location = "seatbooking.php?movie=" + movie + "&time=" + time;
+        }
         $("#message").html(response);
       }
     });

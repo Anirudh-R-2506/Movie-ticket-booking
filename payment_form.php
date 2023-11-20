@@ -15,21 +15,33 @@ if($_POST['card_name'] != '' && $_POST['card_number'] != '' && $_POST['ex_date']
 	$result = mysqli_query($conn,"SELECT * FROM user WHERE username = '".$_SESSION['uname']."'");
 	 if (mysqli_num_rows($result) > 0) {
       while($row = mysqli_fetch_array($result)) {
-      	$uid=$row['id'];
+      		$uid=$row['id'];
       	}
-      }
       $custemer_id= mt_rand();
       $payment = date("D-m-y ",strtotime('today'));
       $booking = date("D-m-y ",strtotime('tomorrow'));
       
       $_SESSION['custemer_id'] = $custemer_id;
-	$insert_record=mysqli_query($conn,"INSERT INTO customers (`uid`,`movie`,`show_time`,`seat`,`totalseat`,`price`,`payment_date`,`booking_date`,`card_name`,`card_number`,`ex_date`,`cvv`,`custemer_id`)VALUES('".$uid."','".$movie."','".$time."','".$seat."','".$totalseat."','".$price."','".$payment."','".$booking."','".$card_name."','".$card_number."','".$ex_date."','".$cvv."','".$custemer_id."')");
-
-	if(!$insert_record)
-	{
-		echo 2;
-	}else{
+	  $conn->autocommit(false);
+	  try {
+	  	$insert_record=mysqli_query($conn,"INSERT INTO customers (`uid`,`movie`,`show_time`,`seat`,`totalseat`,`price`,`payment_date`,`booking_date`,`card_name`,`card_number`,`ex_date`,`cvv`,`custemer_id`)VALUES('".$uid."','".$movie."','".$time."','".$seat."','".$totalseat."','".$price."','".$payment."','".$booking."','".$card_name."','".$card_number."','".$ex_date."','".$cvv."','".$custemer_id."')");
+		$conn->commit();
+		$seats = explode(',', $_POST['seat']);
+		foreach($seats as $s){
+			mysqli_query($conn,"DELETE FROM seat_lock WHERE movie = '$movie' AND show_time = '$time' AND seat = '$s'");
+		}
 		echo 1;
-	}	
+	  } catch (Exception $e) {
+			$conn->rollback();
+			$seats = explode(',', $_POST['seats']);
+			foreach($seats as $s){
+				mysqli_query($conn,"DELETE FROM seat_lock WHERE movie = '$movie' AND show_time = '$time' AND seat = '$s'");
+			}
+			echo "Error booking ticket: " . $e->getMessage();
+    	}
+	 }
+	 else{
+		echo "Error booking ticket: User not found";
+	 }
 }
 ?>

@@ -2,6 +2,6 @@
 
 //database_connection.php
 
-$connect = new PDO("mysql:host=localhost;dbname=moviebook", "root", "");
+$connect = new PDO("mysql:host=127.0.0.1;dbname=moviebook", "root", "root");
 
 ?>

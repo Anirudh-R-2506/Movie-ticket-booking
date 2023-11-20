@@ -51,7 +51,7 @@ session_start();
                         <ul>
                             <li>
                                 <h4>Surendranagar</h4>
-                                <p>Inox Cinema, Near Upashna Circle, Surendranagar.  <br />+91 187-654-3210
+                                <p>Inox Cinema, Near ABC Circle, D Nagar.  <br />+91 187-654-3210
                                     <br />+91 258-963-1470</p>
                             </li>
                         

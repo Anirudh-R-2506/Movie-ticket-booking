@@ -69,22 +69,21 @@
             $movie=$_GET['movie'];
             $date= date("Y-m-d");
 
-            $result = mysqli_query($conn,"SELECT * FROM customers WHERE show_time = '".$time."' && movie = '".$movie."' && payment_date = '".$date."'");
-
-      ?><form method="post"><input type="hidden" name="t1" value="<?php      
-      while($row = mysqli_fetch_array($result)) {
-        echo $row['seat'];
-        echo ",";
-      }?>">
-      <center><input type="submit" name="submit" class="btn btn-primary" value="Check Avaliable Seat"></center></form>
-      <hr>
+            $result = mysqli_query($conn,"SELECT * FROM customers WHERE show_time = '".$time."' && movie = '".$movie."'");
+            $seats1 = [];
+            foreach(mysqli_fetch_all($result) as $row) {
+                foreach(explode(',', $row[4]) as $s){
+                    $seats1[] = $s;
+                }
+            }
+            $result2 = mysqli_query($conn,"SELECT * FROM seat_lock WHERE show_time = '".$time."' && movie = '".$movie."'");
+            foreach(mysqli_fetch_all($result2) as $row) {
+                $seats1[] = $row[2];
+            }
+      ?>
 
 <form action="payment.php" method="post">
-<div class="container">
-    <?php if(isset($_POST['submit'])){
-                    $seats= $_POST['t1'];
-                    $seats1 = explode(",", $seats);
-                 ?>       
+<div class="container">     
     <div class="row">
         <div class="col-lg-6">
     <div class="seatCharts-container">
@@ -789,9 +788,6 @@ if (!isset($_SESSION['uname'])) {
 <div id="count1"></div>
     </div>
 </div>
-    <?php
-}
-?>
 </div>
 
 
@@ -823,6 +819,7 @@ if (!isset($_SESSION['uname'])) {
   document.getElementById( "nameerror" ).innerHTML = error;
   return false;
  }
+}
 </script>
 </body>
 </html>
